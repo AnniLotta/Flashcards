@@ -1,0 +1,46 @@
+<div class="page" data-name="edit-deck">
+    <div class="navbar">
+        <div class="navbar-bg"></div>
+        <div class="navbar-inner sliding">
+            <div class="left">
+                <a href="#" class="link back">
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="page-content">
+        <div class="block-title">Edit deck</div>
+        <form class="list no-hairlines-md" id="edit-deck-form">
+            <ul>
+                <li>
+                <div class="item-content item-input">
+                    <div class="item-inner">
+                        <input id="deck-id" name="key" style="display:none;"/>
+                        <div class="item-title item-label">Name</div>
+                        <div class="item-input-wrap">
+                            <input id="deck-name" name="name" type="text" placeholder="Deck name"/>
+                        </div>
+                    </div>
+                </div>
+                </li>
+                <li>
+                <div class="item-content item-input">
+                    <div class="item-inner">
+                        <div class="item-title item-label">Description</div>
+                        <div class="item-input-wrap">
+                            <input id="deck-description" name="description" type="text" placeholder="Deck description"/>
+                        </div>
+                    </div>
+                </div>
+                </li>
+            </ul>
+            <div class="row">
+                <a href="/home/" class="col button button-large button-fill button-raised color-red delete-deck">Delete deck</a>
+                <a href="#" class="link back col button button-large button-fill button-raised color-green edit-deck">Save</a>
+            </div>
+        </form>
+    </div>
+</div>
+  

@@ -9,7 +9,7 @@ const app = new Framework7({
   store: store,
   // App routes
   routes: routes,
-  
+
 });
 
 var mainView = app.views.create('.view-main');
@@ -50,13 +50,16 @@ $$(document).on("click", ".get-deck-details-data", function () {
   let deckId = $$(this).data("deck-id");
   const deckJson = JSON.parse(localStorage.getItem(deckId));
   $$(document).on("page:afterin", '.page[data-name="edit-deck"]', function () {
-      setDeckData(deckJson, deckId);
+    setDeckData(deckJson, deckId);
   });
 });
 
 $$(document).on("click", ".add-card", function () {
   const cardJson = dataToJson("#card-info");
-  addNewCard(cardJson);
+  const img1 = document.getElementById("add-side1photo");
+  const img2 = document.getElementById("add-side2photo");
+  console.log("taalla")
+  addNewCard(cardJson, img1, img2);
   const cardList = document.getElementById('card-list');
   getCards(cardList);
 });
@@ -81,34 +84,60 @@ let cardsToReview = []
 let currentCard = 0;
 let side1showing = true;
 
+function setPhotos() {
+  const img1 = localStorage.getItem(cardsToReview[currentCard].img1);
+  const img2 = localStorage.getItem(cardsToReview[currentCard].img2);
+  const imgElement1 = document.getElementById("side1photo");
+  const imgElement2 = document.getElementById("side2photo");
+  imgElement1.style.display = "none";
+  imgElement2.style.display = "none";
+
+  if (img1) {
+    imgElement1.src = img1;
+    imgElement1.style.display = "block";
+  }
+  if (img2) {
+    imgElement2.src = img2;
+    imgElement2.style.display = "block";
+  }
+
+}
+
 $$(document).on("click", ".start_review", function () {
   document.getElementById("review-title").innerHTML = 'Review ' + JSON.parse(localStorage.getItem(currentDeckId)).name;
-  document.getElementById("side2").style.display = "none";
+  const side1title = document.getElementById("side1title");
+  const side2title = document.getElementById("side2title");
+  const side2 = document.getElementById("side2");
+  side2.style.display = "none";
   document.getElementById("left-arrow").style.display = "none";
   cardsToReview = getCardsOfCurrentDeck();
   currentCard = 0;
-  const side1 = document.getElementById("side1");
-  const side2 = document.getElementById("side2");
-  side1.innerHTML = cardsToReview[currentCard].side1;
-  side2.innerHTML = cardsToReview[currentCard].side2;
+  side1title.innerHTML = cardsToReview[currentCard].side1;
+  side2title.innerHTML = cardsToReview[currentCard].side2;
+  setPhotos();
   setCardCounter();
 });
 
 function changeCard(change) {
   let newCurrent = currentCard + change;
-  if(newCurrent >= 0 || newCurrent < cardsToReview.length) {
+  if (newCurrent >= 0 || newCurrent < cardsToReview.length) {
     currentCard = newCurrent;
-    side1.innerHTML = cardsToReview[currentCard].side1;
-    side2.innerHTML = cardsToReview[currentCard].side2;
-    if(currentCard === 0) {
-      document.getElementById("left-arrow").style.display = "none";
+    const side1title = document.getElementById("side1title");
+    const side2title = document.getElementById("side2title");
+    side1title.innerHTML = cardsToReview[currentCard].side1;
+    side2title.innerHTML = cardsToReview[currentCard].side2;
+    setPhotos();
+    const leftArrow = document.getElementById("left-arrow");
+    const rightArrow = document.getElementById("right-arrow");
+    if (currentCard === 0) {
+      leftArrow.style.display = "none";
     } else {
-      document.getElementById("left-arrow").style.display = "block";
+      leftArrow.style.display = "block";
     }
-    if(currentCard === cardsToReview.length - 1) {
-      document.getElementById("right-arrow").style.display = "none";
+    if (currentCard === cardsToReview.length - 1) {
+      rightArrow.style.display = "none";
     } else {
-      document.getElementById("right-arrow").style.display = "block";
+      rightArrow.style.display = "block";
     }
     setCardCounter()
   }
@@ -137,3 +166,32 @@ function setDeckData(deckJson, deckId) {
   document.getElementById("deck-description").value = deckJson.description;
   document.getElementById("deck-id").value = deckId;
 }
+
+function openCamera(number) {
+  try {
+    const options = {
+      quality: 50,
+      destinationType: Camera.DestinationType.DATA_URL,
+      sourceType: Camera.PictureSourceType.PHOTOLIBRARY,
+      encodingType: Camera.EncodingType.JPEG,
+      mediaType: Camera.MediaType.PICTURE,
+      allowEdit: false,
+      correctOrientation: true,
+    };
+    navigator.camera.getPicture(
+      function cameraSuccess(img) {
+        const elementId = "add-side" + number + "photo";
+        let element = document.getElementById(elementId);
+        element.src = "data:image/jpeg;base64," + img;
+        element.style.display = "block";
+      },
+      function cameraError(error) {
+        console.debug("Unable to take picture: " + error, "app");
+      },
+      options
+    );
+  }
+  catch {
+    console.error("Something went wrong.");
+  }
+};

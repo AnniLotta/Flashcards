@@ -8,7 +8,6 @@
   <allow-navigation href="*"/>
   <allow-intent href="itms:*"/>
   <allow-intent href="itms-apps:*"/>
-
   <preference name="DisallowOverscroll" value="true"/>
   <preference name="Orientation" value="default"/>
   <preference name="loglevel" value="DEBUG"/>
@@ -39,7 +38,6 @@
   <preference name="UIWebViewDecelerationSpeed" value="normal"/>
   <preference name="monaca:AndroidIsPackageNameSeparate" value="false"/>
   <preference name="target-device" value="universal"/>
-
   <platform name="ios">
     <preference name="orientation" value="all"/>
     <icon src="/res/ios/icon/icon.png" width="57" height="57"/>
@@ -82,7 +80,7 @@
     <preference name="hostname" value="localhost"/>
   </platform>
   <platform name="android">
-    <preference name="android-targetSdkVersion" value="29" />
+    <preference name="android-targetSdkVersion" value="29"/>
     <icon src="/res/android/icon/ldpi.png" density="ldpi"/>
     <icon src="/res/android/icon/mdpi.png" density="mdpi"/>
     <icon src="/res/android/icon/hdpi.png" density="hdpi"/>
@@ -104,4 +102,16 @@
     <preference name="SplashScreenHeight" value="300"/>
     <preference name="ShowSplashScreen" value="false"/>
   </platform>
+  <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need camera access to take pictures</string>
+  </edit-config>
+  <edit-config target="NSPhotoLibraryUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need to photo library access to get pictures from there</string>
+  </edit-config>
+  <edit-config target="NSLocationWhenInUseUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need location access to find things nearby</string>
+  </edit-config>
+  <edit-config target="NSPhotoLibraryAddUsageDescription" file="*-Info.plist" mode="merge">
+    <string>need to photo library access to save pictures there</string>
+  </edit-config>
 </widget>

@@ -167,6 +167,20 @@ $$(document).on("click", ".get-card-details", function () {
   });
 });
 
+$$(document).on("click", ".toggle-mark", function () {
+  const cardId = $$(this).data("card-id");
+  const starIcon = document.getElementById("mark-icon" + cardId);
+  const cardJson = JSON.parse(localStorage.getItem(cardId));
+  cardJson.marked = !cardJson.marked;
+  localStorage.setItem(cardJson.key, JSON.stringify(cardJson));
+  if(cardJson.marked) {
+    starIcon.innerHTML = "star_fill";
+  } else starIcon.innerHTML = "star";
+  if(!anyMarkedCards()) {
+    document.getElementById("review-marked").classList.add("disabled");
+  } else document.getElementById("review-marked").classList.remove("disabled");
+});
+
 //Methods for card review//
 
 let cardsToReview = []
@@ -193,6 +207,7 @@ function setPhotos() {
 }
 
 $$(document).on("click", ".start_review", function () {
+  const markedCards = $$(this).data("marked-cards");
   document.getElementById("review-title").innerText = 'Review ' + JSON.parse(localStorage.getItem(currentDeckId)).name;
   const side1title = document.getElementById("side1title");
   const side2title = document.getElementById("side2title");
@@ -200,6 +215,7 @@ $$(document).on("click", ".start_review", function () {
   side2.style.display = "none";
   document.getElementById("left-arrow").style.display = "none";
   cardsToReview = getCardsOfCurrentDeck();
+  if (markedCards) cardsToReview = getMarkedCards(cardsToReview);
   currentCard = 0;
   side1title.innerHTML = cardsToReview[currentCard].side1;
   side2title.innerHTML = cardsToReview[currentCard].side2;

@@ -1,32 +1,33 @@
-<div class="page" data-name="new-deck">
+<div class="page" data-name="edit-card">
     <div class="navbar">
         <div class="navbar-bg"></div>
         <div class="navbar-inner sliding">
             <div class="left">
                 <a href="#" class="link back">
-                    <i class="icon icon-back"></i>
-                    <span class="if-not-md">Back</span>
+                <i class="icon icon-back"></i>
+                <span class="if-not-md">Back</span>
                 </a>
             </div>
         </div>
     </div>
     <div class="page-content">
-        <div class="block-title">New card</div>
-        <form class="list no-hairlines-md" id="card-info">
+        <div class="block-title">Edit card</div>
+        <form class="list no-hairlines-md" id="edit-card-form">
             <ul>
                 <li>
                     <div class="item-content item-input row">
                         <div class="item-inner col-85">
+                            <input id="card-id" name="key" style="display:none;"/>
                             <div class="item-title item-label">Side 1</div>
                             <div class="item-input-wrap">
-                                <input name="side1" type="text" placeholder="Card's first side" />
+                                <input id="card-side1" name="side1" type="text" placeholder="Card's first side" />
                             </div>
                         </div>
-                        <a class="col-15 margin-right" onclick="selectPhoto(1, 'add')">
+                        <a class="col-15 margin-right" onclick="selectPhoto(1, 'edit')">
                             <i class="icon f7-icons">camera</i>
                         </a>
                         <div class="block display-flex justify-content-center">
-                            <img id="add-side1photo" width="100" height="100" src="" style="display: none;">
+                            <img id="edit-side1photo" width="100" height="100" src="" style="display: none;">
                         </div>
                     </div>
                 </li>
@@ -35,14 +36,14 @@
                         <div class="item-inner col-85">
                             <div class="item-title item-label">Side 2</div>
                             <div class="item-input-wrap">
-                                <input name="side2" type="text" placeholder="Card's second side" />
+                                <input id="card-side2" name="side2" type="text" placeholder="Card's second side" />
                             </div>
                         </div>
-                        <a class="col-15 margin-right" onclick="selectPhoto(2, 'add')">
+                        <a class="col-15 margin-right" onclick="selectPhoto(2, 'edit')">
                             <i class="icon f7-icons">camera</i>
                         </a>
                         <div class="block display-flex justify-content-center">
-                            <img width="100" height="100" id="add-side2photo" src="" style="display: none;">
+                            <img width="100" height="100" id="edit-side2photo" src="" style="display: none;">
                         </div>
                     </div>
                 </li>
@@ -50,7 +51,8 @@
         </form>
         <p class="row">
             <a href="#"
-                class="link back col margin-horizontal button button-large button-fill button-raised add-card">Create</a>
+                class="link back col margin-horizontal button button-large button-fill button-raised edit-card">Save
+            </a>
         </p>
     </div>
 </div>

@@ -44,6 +44,10 @@ var routes = [
     url: './pages/card-review.html',
   },
   {
+    path: '/edit-card/',
+    url: './pages/edit-card.html',
+  },
+  {
     path: '/request-and-load/user/:userId/',
     async: function ({ router, to, resolve }) {
       // App instance

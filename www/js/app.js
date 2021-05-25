@@ -66,7 +66,7 @@ $$(document).on("click", ".delete-deck", function () {
   const deckJson = dataToJson("#edit-deck-form");
   if (useFirebase) {
     db.collection("decks").doc(deckJson.key).delete().then(() => {
-      for (let i = 0; i < allCardsInDB.length; i++) {
+      for (let i = 0; i < allCardsInDB.length; i++) { //Delete all the cards of the deck
         if (allCardsInDB[i].deck === deckJson.key) deleteCard(allCardsInDB[i].id);
       }
       console.log("Deck successfully deleted!");
@@ -84,6 +84,7 @@ $$(document).on("click", ".delete-deck", function () {
 $$(document).on("click", ".get-deck-details", function () {
   let deckId = $$(this).data("deck-id");
   let result = '';
+
   if (useFirebase) {
     const docRef = db.collection("decks").doc(deckId);
     docRef.get().then((doc) => {
@@ -94,6 +95,7 @@ $$(document).on("click", ".get-deck-details", function () {
       console.log("Error getting deck:", error);
     });
   }
+
   else result = JSON.parse(localStorage.getItem(deckId));
 
   $$(document).on("page:afterin", '.page[data-name="edit-deck"]', function () {
@@ -103,6 +105,7 @@ $$(document).on("click", ".get-deck-details", function () {
 
 $$(document).on("click", ".edit-deck", function () {
   const deckJson = dataToJson("#edit-deck-form");
+
   if (useFirebase) {
     db.collection("decks").doc(deckJson.key).update({
       name: deckJson.name,
@@ -115,7 +118,9 @@ $$(document).on("click", ".edit-deck", function () {
         console.error("Error updating deck: ", error);
       });
   }
+
   else localStorage.setItem(deckJson.key, JSON.stringify(deckJson));
+
   document.getElementById('deck-title').innerHTML = deckJson.name;
 });
 
@@ -128,6 +133,7 @@ function setDeckData(deckJson, deckId) {
 
 //Methods for cards//
 
+//Get the cards that are marked with a star
 function getMarkedCards(cards) {
   let result = [];
   for (let i = 0; i < cards.length; i++) {
@@ -138,6 +144,7 @@ function getMarkedCards(cards) {
   return result;
 }
 
+//Check if there are any marked cards
 function anyMarkedCards(cards) {
   let result = false;
   let cardsToCheck = cards;
@@ -154,12 +161,12 @@ function anyMarkedCards(cards) {
 
 function getCardHTML(id, side1, side2, starIcon, marked) {
   return `<div class="card block block-strong inset display-flex row">
-       <a class="col-10 padding-top margin-left toggle-mark" data-card-id="${id}"><i class="icon f7-icons color-yellow" id="${starIcon}">${marked ? 'star_fill' : 'star'}</i></a>
-       <div class="col-70 margin-left">
+       <a class="col-15 padding-top margin-left toggle-mark" data-card-id="${id}"><i class="icon f7-icons color-yellow" id="${starIcon}">${marked ? 'star_fill' : 'star'}</i></a>
+       <div class="col-55 margin-left">
            <p><b>${side1}</b></p>
            <p>${side2}</p>
        </div>
-       <div class="col-20">
+       <div class="col-30">
            <div class="row margin-top">
                <a class="get-card-details col-50" href="/edit-card/" data-card-id="${id}"><i class="icon f7-icons float-right margin-right">pencil</i></a>
                <a onclick="deleteCard()" class="delete-card col-50" data-card-id="${id}"><i class="icon f7-icons color-red float-right margin-right">bin_xmark_fill</i></a>
@@ -207,6 +214,7 @@ function deleteCard(cardToDelete) {
   });
 }
 
+//Set cards of a deck on the card-list page
 $$(document).on("click", ".get-cards", function () {
   let deckId = $$(this).data("deck-id");
   $$(document).on("page:init", '.page[data-name="card-list"]', function () {
@@ -224,9 +232,11 @@ $$(document).on("click", ".edit-card", function () {
   const cardJson = dataToJson("#edit-card-form");
   const side1img = document.getElementById("edit-side1photo");
   const side2img = document.getElementById("edit-side2photo");
+
   if (useFirebase) {
     updateCardDB(cardJson, side1img, side2img);
   }
+
   else {
     const cardData = JSON.parse(localStorage.getItem(cardJson.key));
     cardData.side1 = cardJson.side1;
@@ -245,7 +255,8 @@ $$(document).on("click", ".edit-card", function () {
 
 let photo1Seleced = false;
 let photo2Seleced = false;
-//Select photo for a card
+
+//Select a photo for a card
 function selectPhoto(number, page) {
   try {
     const options = {
@@ -288,6 +299,7 @@ function setCardData(cardJson, cardId) {
   img2.src = '';
   img1.style.display = "none"
   img2.style.display = "none"
+
   if (useFirebase) {
     if (cardJson.img1) {
       getImage(cardId + '1', img1);
@@ -298,6 +310,7 @@ function setCardData(cardJson, cardId) {
       img2.style.display = "block";
     }
   }
+
   else {
     if (cardJson.img1 !== '') {
       img1.src = localStorage.getItem(cardJson.img1);
@@ -310,9 +323,11 @@ function setCardData(cardJson, cardId) {
   }
 }
 
+//Set card info to the edit-card pages
 $$(document).on("click", ".get-card-details", function () {
   let cardId = $$(this).data("card-id");
   let cardJson = '';
+
   if (useFirebase) {
     const docRef = db.collection("cards").doc(cardId);
     docRef.get().then((doc) => {
@@ -324,25 +339,21 @@ $$(document).on("click", ".get-card-details", function () {
       console.log("Error getting card:", error);
     });
   }
+
   else {
     cardJson = JSON.parse(localStorage.getItem(cardId));
     $$(document).on("page:afterin", '.page[data-name="edit-card"]', function () {
       setCardData(cardJson, cardId);
     });
   }
+
 });
 
-function emptyPhotos() {
-  document.getElementById("edit-side1photo").style.display = 'none';
-  document.getElementById("edit-side1photo").src = "";
-  document.getElementById("edit-side2photo").style.display = 'none';
-  document.getElementById("edit-side2photo").src = "";
-}
-
+//Mark or unmark a card
 $$(document).on("click", ".toggle-mark", function () {
   const cardId = $$(this).data("card-id");
   let starIcon = document.getElementById("mark-iconcard" + cardId);
-  console.log("mark-iconcard" + cardId)
+
   if (useFirebase) {
     toggleMarkDatabase(cardId, starIcon);
   } else {
@@ -357,11 +368,15 @@ let cardsToReview = []
 let currentCard = 0;
 let side1showing = true;
 
+//Set photos on a card when reviewing
 function setPhotos(cardId) {
   const imgElement1 = document.getElementById("side1photo");
   const imgElement2 = document.getElementById("side2photo");
   imgElement1.style.display = "none";
   imgElement2.style.display = "none";
+  imgElement1.src = "";
+  imgElement2.src = "";
+
   if (useFirebase) {
     for (let i = 0; i < allCardsInDB.length; i++) {
       if (allCardsInDB[i].id === cardId) {
@@ -398,57 +413,72 @@ $$(document).on("click", ".start_review", function () {
   const side2title = document.getElementById("side2title");
   const side2 = document.getElementById("side2");
   side2.style.display = "none";
+
+  //Choose only marked cards if reviewing only marked cards
   if (markedCards === 'true') cardsToReview = getMarkedCards(cardsToReview);
+
+  //Set arrow buttons
   document.getElementById("left-arrow").style.display = "none";
-  console.log(cardsToReview)
   if (cardsToReview.length < 2) document.getElementById("right-arrow").style.display = "none";
   else document.getElementById("right-arrow").style.display = "block";
+
   currentCard = 0;
+  setPhotos(cardsToReview[currentCard].id);
   side1title.innerHTML = cardsToReview[currentCard].side1;
   side2title.innerHTML = cardsToReview[currentCard].side2;
-  setPhotos(cardsToReview[currentCard].id);
   setCardCounter();
 });
 
+//Change card when reviewing
 function changeCard(change) {
-  let newCurrent = currentCard + change;
-  if (newCurrent >= 0 || newCurrent < cardsToReview.length) {
-    currentCard = newCurrent;
-    const side1title = document.getElementById("side1title");
-    const side2title = document.getElementById("side2title");
-    side1title.innerHTML = cardsToReview[currentCard].side1;
-    side2title.innerHTML = cardsToReview[currentCard].side2;
-    setPhotos(cardsToReview[currentCard].id);
-    const leftArrow = document.getElementById("left-arrow");
-    const rightArrow = document.getElementById("right-arrow");
-    if (currentCard === 0) {
-      leftArrow.style.display = "none";
-    } else {
-      leftArrow.style.display = "block";
-    }
-    if (currentCard === cardsToReview.length - 1) {
-      rightArrow.style.display = "none";
-    } else {
-      rightArrow.style.display = "block";
-    }
-    setCardCounter()
+  currentCard += change;
+  setPhotos(cardsToReview[currentCard].id);
+  const side1title = document.getElementById("side1title");
+  const side2title = document.getElementById("side2title");
+  side1title.style.display = "none";
+
+  //Changing to the first side of the card showing
+  side1showing = false;
+  changeSide();
+
+  side1title.innerHTML = cardsToReview[currentCard].side1;
+  side2title.innerHTML = cardsToReview[currentCard].side2;
+  side1title.style.display = "block";
+
+  //Set the arrow buttons
+  const leftArrow = document.getElementById("left-arrow");
+  const rightArrow = document.getElementById("right-arrow");
+  if (currentCard === 0) {
+    leftArrow.style.display = "none";
+  } else {
+    leftArrow.style.display = "block";
   }
+  if (currentCard === cardsToReview.length - 1) {
+    rightArrow.style.display = "none";
+  } else {
+    rightArrow.style.display = "block";
+  }
+
+  setCardCounter();
 
 }
 
+//Mark the numbers of the cards when reviewing
 function setCardCounter() {
   document.getElementById("card-counter").innerHTML = currentCard + 1 + '/' + cardsToReview.length;
 }
 
-$$(document).on("click", ".change-side", function () {
+//Change the side of a card when reviewing
+function changeSide() {
   const side1 = document.getElementById("side1");
   const side2 = document.getElementById("side2");
   side1.style.display = "none";
   side2.style.display = "none";
+
   if (side1showing) {
     side2.style.display = "block";
   } else {
     side1.style.display = "block";
   }
   side1showing = !side1showing;
-});
+}

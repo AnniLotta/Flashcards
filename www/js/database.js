@@ -58,17 +58,18 @@ function setDeckTitle(element) {
 
 const getCardsDatabase = (element, deckId) => {
     if (deckId) openDeckId = deckId;
+    document.getElementById("review-all").classList.remove("disabled");
+
     //Count the cards in the database
     db.collection('cards').get().then(snap => {
         cardsInDB = snap.size;
     });
+
     db.collection('cards').onSnapshot((doc) => {
         allCardsInDB = [];
         let isEmpty = true;
         let result = '';
-        let i = 0;
         doc.docs.forEach((doc) => {
-            i++;
             const card = doc.data();
             if (card.deck === openDeckId) {
                 isEmpty = false;
@@ -76,22 +77,31 @@ const getCardsDatabase = (element, deckId) => {
                 allCardsInDB.push(card);
                 result += getCardHTML(doc.id, card.side1, card.side2, "mark-iconcard" + doc.id, card.marked);
             }
-            if (i === cardsInDB) {
-                setDeckTitle('deck-title');
-                document.getElementById("edit-icon").innerHTML =
-                    `<a class="get-deck-details col-60" href="/edit-deck/${openDeckId}/" data-deck-id="${openDeckId}">
-                        <i class="icon f7-icons">pencil</i>
-                    </a>`;
-                element.innerHTML = result;
-            }
+
         });
+
+        //Set the deck title and edit-icion
+        setDeckTitle('deck-title');
+        document.getElementById("edit-icon").innerHTML =
+            `<a class="get-deck-details col-60" href="/edit-deck/${openDeckId}/" data-deck-id="${openDeckId}">
+                    <i class="icon f7-icons">pencil</i>
+                </a>`;
+
+        //Add all the cards to the card list page        
+        element.innerHTML = result;
+
+        //If there are no cards in the deck
         if (isEmpty) {
+            //Disable review button
+            document.getElementById("review-all").classList.add("disabled");
             result += `
             <div class="card block block-strong inset">
                 <div class="item-inner display-flex justify-content-center">The deck is empty.</div>
             </div>`;
+            element.innerHTML = result;
         }
-        element.innerHTML = result;
+
+        //If there are no marked cards, disable the other review button
         if (!anyMarkedCards(allCardsInDB)) document.getElementById("review-marked").classList.add("disabled");
     });
 }
@@ -105,6 +115,7 @@ function addCardToDatabase(cardJson, img1, img2) {
         'img1': img1.style.display !== 'none',
         'img2': img2.style.display !== 'none'
     }
+
     db.collection('cards').add(newCard).then((docRef) => {
         if (img1.style.display !== 'none') {
             imageToDB(docRef.id + "1.jpg", img1.src.substring(23));
@@ -143,6 +154,7 @@ function updateCardDB(cardJson, img1, img2) {
 
 function toggleMarkDatabase(cardId, starIcon) {
     let marked = false;
+
     for (i = 0; i < allCardsInDB.length; i++) {
         if (allCardsInDB[i].id === cardId) {
             marked = !allCardsInDB[i].marked
@@ -150,13 +162,18 @@ function toggleMarkDatabase(cardId, starIcon) {
             break;
         }
     }
+
+    //Change the star icon
     if (marked) {
         starIcon.innerHTML = "star_fill";
     } else starIcon.innerHTML = "star";
+
+    //Disable the other review-button, if there are no marked cards
     if (!anyMarkedCards(allCardsInDB)) {
         document.getElementById("review-marked").classList.add("disabled");
     } else document.getElementById("review-marked").classList.remove("disabled");
 
+    //Update mark to the database
     db.collection("cards").doc(cardId).update({
         marked: marked
     });
@@ -174,7 +191,6 @@ function getCardsOfCurrentDeckDB() {
 
 function imageToDB(fileName, img) {
     const storageRef = firebase.storage().ref('cards/' + fileName);
-    console.log(img);
     storageRef.putString(img, 'base64').then((snapshot) => {
         console.log('Uploaded a base64 string!');
     })
@@ -187,10 +203,9 @@ function getImage(cardId, element) {
     const storageRef = firebase.storage().ref();
     const filename = 'cards/' + cardId + '.jpg';
     const ref = storageRef.child(filename);
-
+    element.style.display = 'block';
     ref.getDownloadURL().then(function (url) {
         element.src = url;
-        element.style.display = 'block';
     }).catch(function (error) {
         console.log(error)
     });

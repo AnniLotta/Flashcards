@@ -1,3 +1,7 @@
+#card-content {
+    height: 200px;
+}
+
 @media only screen and (min-device-width : 1024px) {
     .photo-select { 
         visibility: hidden;

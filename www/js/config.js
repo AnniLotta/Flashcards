@@ -1,9 +1,9 @@
 let db = null;
-let useDatabaseApi = false;
+let useFirebase = true; //Change this to true when using Firebase
 
 // Firebase configuration and initialization
 const initFirebase = () => {
-    
+
     const firebaseConfig = {
         apiKey: "AIzaSyCmMKSQw27UwmCINTlrQnmEwugpeCJqTTQ",
         authDomain: "flashcards-2ec54.firebaseapp.com",

@@ -4,7 +4,7 @@ allDecks = localStorage.getItem("allDecks") > 0 ? localStorage.getItem("allDecks
 allCards = localStorage.getItem("allCards") > 0 ? localStorage.getItem("allCards") : 0;
 let currentDeckId = '';
 
-function addNewDeck(deckJson) {
+function addNewDeckLocal(deckJson) {
     let newDeck = {
         key: "deck" + allDecks++,
         name: deckJson.name,
@@ -14,23 +14,14 @@ function addNewDeck(deckJson) {
     localStorage.setItem("allDecks", allDecks);
 }
 
-function getDecks(element) {
+function getDecksLocal(element) {
     let empty = true;
     let result = "";
     for (let i = 0; i < localStorage.getItem("allDecks"); i++) {
         if (localStorage.getItem("deck" + i)) {
             empty = false;
             const deckJson = JSON.parse(localStorage.getItem("deck" + i));
-            result += `
-          <div class="card block block-strong inset display-flex row">
-            <div class="col-70 margin-left get-cards" data-deck-id="${"deck" + i}">
-              <p><b>${deckJson.name}</b></p>
-              <p>${deckJson.description}</p>
-            </div>
-            <div class="col-30">
-              <a href="/card-list/${"deck" + i}/" class="get-cards" data-deck-id="${"deck" + i}"><i class="icon f7-icons float-right margin-right padding-top">eyeglasses</i></a>
-            </div>
-          </div>`;
+            result += getDeckHTML("deck" + i, deckJson.name, deckJson.description);
         }
     }
 
@@ -43,7 +34,7 @@ function getDecks(element) {
     element.innerHTML = result;
 }
 
-function addNewCard(cardJson, img1, img2) {
+function addCardLocal(cardJson, img1, img2) {
     let newCard = {
         key: "card" + allCards++,
         side1: cardJson.side1,
@@ -64,10 +55,9 @@ function addNewCard(cardJson, img1, img2) {
     }
     localStorage.setItem(newCard.key, JSON.stringify(newCard));
     localStorage.setItem("allCards", allCards);
-    console.log(localStorage.getItem(newCard.key));
 }
 
-function getCardsOfCurrentDeck() {
+function getCardsOfCurrentDeckLocal() {
     let result = [];
     for (let i = 0; i < localStorage.getItem("allCards"); i++) {
         if (localStorage.getItem("card" + i)) {
@@ -80,27 +70,20 @@ function getCardsOfCurrentDeck() {
     return result;
 }
 
-function getMarkedCards(cards) {
-    let result = [];
-    for (let i = 0; i < cards.length; i++) {
-        if (cards[i].marked) {
-            result.push(cards[i]);
-        }
-    }
-    return result;
+function toggleMarkLocal(cardId, starIcon) {
+    const cardJson = JSON.parse(localStorage.getItem(cardId));
+    cardJson.marked = !cardJson.marked;
+    localStorage.setItem(cardJson.key, JSON.stringify(cardJson));
+
+    if (cardJson.marked) {
+      starIcon.innerHTML = "star_fill";
+    } else starIcon.innerHTML = "star";
+    if (!anyMarkedCards()) {
+      document.getElementById("review-marked").classList.add("disabled");
+    } else document.getElementById("review-marked").classList.remove("disabled");
 }
 
-function anyMarkedCards() {
-    const cards = getCardsOfCurrentDeck();
-    for (let i = 0; i < cards.length; i++) {
-        if (cards[i].marked) {
-            return true;
-        }
-    }
-    return false;
-}
-
-function getCards(element, deckId) {
+function getCardsLocal(element, deckId) {
     if (deckId) currentDeckId = deckId;
     let empty = true;
     const deckJson = JSON.parse(localStorage.getItem(currentDeckId));
@@ -110,20 +93,7 @@ function getCards(element, deckId) {
             const cardJson = JSON.parse(localStorage.getItem("card" + i));
             if (cardJson.deck === currentDeckId) {
                 empty = false;
-                result += `
-                    <div class="card block block-strong inset display-flex row">
-                        <a class="col-10 padding-top margin-left toggle-mark" data-card-id="${"card" + i}"><i class="icon f7-icons color-yellow" id="${"mark-iconcard" + i}">star</i></a>
-                        <div class="col-70 margin-left">
-                            <p><b>${cardJson.side1}</b></p>
-                            <p>${cardJson.side2}</p>
-                        </div>
-                        <div class="col-20">
-                            <div class="row margin-top">
-                                <a class="get-card-details col-50" href="/edit-card/" data-card-id="${"card" + i}"><i class="icon f7-icons float-right margin-right">pencil</i></a>
-                                <a class="delete-card col-50" data-card-id="${"card" + i}"><i class="icon f7-icons color-red float-right margin-right">bin_xmark_fill</i></a>
-                            </div>
-                        </div>
-                    </div>`;
+                result += getCardHTML("card" + i, cardJson.side1, cardJson.side2, "mark-iconcard" + i, cardJson.marked);
             }
         }
     }

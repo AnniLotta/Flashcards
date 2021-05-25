@@ -1,1 +1,5 @@
-/* Your app custom styles here */
+@media only screen and (min-device-width : 1024px) {
+    .photo-select { 
+        visibility: hidden;
+    }
+}
